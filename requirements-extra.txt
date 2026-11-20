@@ -1,0 +1,3 @@
+# Optional: only for E6 (step 12) in real mode. Install on your laptop:  pip install -r requirements-extra.txt
+# The first run downloads the model weights. CHECK the TabPFN page for any licence or login step.
+tabpfn>=2.0

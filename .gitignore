@@ -1,0 +1,21 @@
+# Private and raw data: never pushed
+00_admin/
+02_data/raw/
+02_data/processed/
+02_data/demo/
+02_data/raw/knust/registrar_2x2.csv
+# Results stay off GitHub until the editor asks (visibility rule)
+06_results/
+05_experiments/*
+!05_experiments/.gitkeep
+# Python and notebook clutter
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+# Keys and secrets
+.env
+*.key
+secrets*

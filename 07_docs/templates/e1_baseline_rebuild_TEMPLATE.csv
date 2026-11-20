@@ -1,0 +1,3 @@
+setting,test_students,withdrawal_rate,roc_auc,pr_auc,precision_top20,recall_top20,source_script
+removed if unregistered before day 28 (main pipeline),,,,,,,scripts/09_wu_comparable_sensitivity.py
+all registrations kept (comparable to Wu et al. 2026),,,,,,,scripts/09_wu_comparable_sensitivity.py

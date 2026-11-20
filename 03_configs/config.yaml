@@ -1,0 +1,103 @@
+# One settings file for the whole study. No script hard-codes a setting.
+# Lines marked CHECK must be confirmed before the first real run.
+# After you lock the plan (04_src/05_lock_plan.py), any change here is a deviation
+# and must be logged with:  python 04_src/05_lock_plan.py --deviation "reason"
+
+paths:
+  oulad_raw: 02_data/raw/oulad          # the seven OULAD CSV files, as downloaded
+  knust_raw: 02_data/raw/knust          # the three KNUST exports (PRIVATE, never pushed)
+  demo_raw: 02_data/demo                # synthetic files written by 01_make_demo_data.py
+  processed: 02_data/processed
+  results: 06_results
+  lock_file: 03_configs/plan_lock.json
+  deviation_log: 07_docs/deviation_log.md
+
+windows: [14, 28, 42]          # prediction days after course start
+main_window: 28
+pre_start_days: 14             # events up to 14 days before the start are kept
+
+labels:
+  inactivity_days: 21          # L1 and L4: consecutive inactive days up to the end
+  inactivity_sensitivity: [14, 28]
+  consecutive_missed: 2        # L1 and L5: consecutive assessments without a result
+  last_quarter_start: 0.75     # L3 (Moodle default): no activity after 75% of the course
+  proxies: [L1, L2, L3, L4, L5]
+  oulad_versions: [due, emulated]   # due = uses due dates; emulated = ignores them, as KNUST must
+  oulad_exclude_assessment_types: [Exam]   # exam rows are sparse in studentAssessment
+
+features:
+  source: starter              # starter = built here; external = your frozen feature files
+  external_pattern: "02_data/processed/external/{dataset}_T{window}.csv"   # CHECK if source is external
+  shared: [clicks_total_z, active_days_z, active_ratio, clicks_per_active_day_z, gap_frac,
+           first_click_frac, clicks_last_week_z, click_trend_z, n_early_assess_z,
+           has_early_assess, early_score_mean]
+  recency: [gap_frac, clicks_last_week_z, click_trend_z]    # removed in the E4 ablation
+
+models:
+  hgb:                         # CHECK: copy the frozen values from your frozen_pipeline.json
+    max_depth: 3
+    learning_rate: 0.05
+    min_samples_leaf: 10
+    max_iter: 300
+    early_stopping: true
+    validation_fraction: 0.15
+    class_weight: balanced
+  logreg:
+    C: 1.0
+    max_iter: 2000
+    class_weight: balanced
+
+oulad_split:                   # time-aware split, as in your draft
+  train: [2013B, 2013J]
+  validation: [2014B]
+  test: [2014J]
+
+cv:
+  n_splits: 5
+  n_repeats: 10
+  seed: 42
+
+seeds: [42, 7, 2026]           # E2 training seeds
+capacity: 0.20                 # advisers can contact the top 20%
+bootstrap: 1000
+
+margins:                       # fixed before any real run
+  pr_auc: 0.02
+  roc_auc: 0.02
+  recall_at_capacity: 0.03
+  proxy_usable_pr_auc_loss: 0.02
+kappa_bands:
+  acceptable: 0.60
+  weak: 0.40
+
+channel_audit:
+  min_positives_per_channel: 30
+
+small_sample:
+  n_draws: 20
+  size: 300
+
+tabpfn:
+  backend: auto                # auto = real TabPFN if installed and loadable, else skip. mock = demo stand-in
+  device: cpu
+  folds_used: 10               # first 10 of the 50 folds, to keep CPU time modest (ASSUMPTION)
+
+knust:                         # CHECK every column name against your three export files
+  course_start: "2026-01-12"
+  export_end: "2026-06-20"
+  activity_file: activity_log.csv
+  activity_id_col: participant_id
+  activity_time_col: event_time
+  activity_type_col: activity_type
+  activity_source_col: access_source
+  time_format: null            # null lets pandas infer. CHECK
+  gradebook_file: gradebook.csv
+  gradebook_id_col: participant_id
+  gradebook_quiz_cols: [quiz1, quiz2, quiz3, quiz4, quiz5, quiz6]   # in module order. CHECK
+  attempts_file: quiz_attempts.csv
+  attempts_id_col: participant_id
+  attempts_quiz_col: quiz
+  attempts_state_col: state
+  attempts_finished_value: finished
+  attempts_score_col: score
+  attempts_finish_col: finished_time
