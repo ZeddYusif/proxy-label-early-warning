@@ -34,13 +34,12 @@ features:
   recency: [gap_frac, clicks_last_week_z, click_trend_z]    # removed in the E4 ablation
 
 models:
-  hgb:                         # CHECK: copy the frozen values from your frozen_pipeline.json
-    max_depth: 3
-    learning_rate: 0.05
-    min_samples_leaf: 10
-    max_iter: 300
-    early_stopping: true
-    validation_fraction: 0.15
+  hgb:                         # Copied from the frozen values from your frozen_pipeline.json
+    max_depth: 8
+    learning_rate: 0.02097077545038924
+    min_samples_leaf: 29
+    max_iter: 350
+    l2_regularization: 0.005337032762603957
     class_weight: balanced
   logreg:
     C: 1.0
@@ -82,7 +81,7 @@ tabpfn:
   device: cpu
   folds_used: 10               # first 10 of the 50 folds, to keep CPU time modest (ASSUMPTION)
 
-knust:                         # CHECK every column name against your three export files
+knust:                         
   course_start: "2026-01-12"
   export_end: "2026-06-20"
   activity_file: activity_log.csv

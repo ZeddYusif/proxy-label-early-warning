@@ -37,10 +37,11 @@ if missing:
 n0 = len(log)
 log = log.drop_duplicates()
 say(f"  activity log: {n0:,} rows, {n0 - len(log):,} exact duplicates removed")
-log["t"] = pd.to_datetime(log[kc["activity_time_col"]], format=kc.get("time_format"), errors="coerce")
+log["t"] = pd.to_datetime(log[kc["activity_time_col"]], format=kc.get("time_format"), errors="coerce", utc=True).dt.tz_localize(None)
 bad = log["t"].isna().sum()
 if bad:
     say(f"  WARNING: {bad:,} event times could not be read and are left out. Check time_format in config.yaml.")
+all_ids = set(log[kc["activity_id_col"]].astype(str))
 log["day"] = (log["t"].dt.normalize() - start).dt.days
 log = log[(log["day"] >= -pre) & (log["day"] <= length)]
 log["student_key"] = log[kc["activity_id_col"]].astype(str)
@@ -49,13 +50,16 @@ channel = (log.groupby("student_key")[kc["activity_source_col"]]
            .agg(lambda s: s.value_counts().idxmax()).rename("channel"))
 
 gb = pd.read_csv(src / kc["gradebook_file"])
+if "grade_item" in gb.columns and kc["gradebook_quiz_cols"][0] not in gb.columns:
+    gb = gb.dropna(subset=["grade_item"])
+    gb = gb.pivot_table(index=kc["gradebook_id_col"], columns="grade_item", values="finalgrade", aggfunc="first").reset_index()
 gb["student_key"] = gb[kc["gradebook_id_col"]].astype(str)
 quiz_cols = kc["gradebook_quiz_cols"]
 missing = [c for c in quiz_cols if c not in gb.columns]
 if missing:
     stop(f"gradebook has no column(s) {missing}. Its columns are {list(gb.columns)}. Edit config.yaml.")
 
-ids = sorted(set(events["student_key"]) | set(gb["student_key"]))
+ids = sorted(set(events["student_key"]) | set(gb["student_key"]) | all_ids)
 students = pd.DataFrame({"student_key": ids, "course": "KNUST_2026", "presentation": "2026",
                          "length_days": length, "official_withdrawn": pd.NA, "unreg_day": pd.NA})
 students = students.merge(channel, on="student_key", how="left")
@@ -65,7 +69,7 @@ events.to_csv(out / "events.csv", index=False)
 att = pd.read_csv(src / kc["attempts_file"])
 att["student_key"] = att[kc["attempts_id_col"]].astype(str)
 att = att[att[kc["attempts_state_col"]] == kc["attempts_finished_value"]].copy()
-att["t"] = pd.to_datetime(att[kc["attempts_finish_col"]], format=kc.get("time_format"), errors="coerce")
+att["t"] = pd.to_datetime(att[kc["attempts_finish_col"]], format=kc.get("time_format"), errors="coerce", utc=True).dt.tz_localize(None)
 att["result_day"] = (att["t"].dt.normalize() - start).dt.days
 first_fin = att.groupby(["student_key", kc["attempts_quiz_col"]])["result_day"].min()
 
