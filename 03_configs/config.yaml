@@ -26,8 +26,8 @@ labels:
   oulad_exclude_assessment_types: [Exam]   # exam rows are sparse in studentAssessment
 
 features:
-  source: starter              # starter = built here; external = your frozen feature files
-  external_pattern: "02_data/processed/external/{dataset}_T{window}.csv"   # CHECK if source is external
+  source: external              # starter = built here; external = your frozen feature files
+  external_pattern: "02_data/processed/external/{dataset}_T{window}.csv"   
   shared: [clicks_total_z, active_days_z, active_ratio, clicks_per_active_day_z, gap_frac,
            first_click_frac, clicks_last_week_z, click_trend_z, n_early_assess_z,
            has_early_assess, early_score_mean]
@@ -46,7 +46,7 @@ models:
     max_iter: 2000
     class_weight: balanced
 
-oulad_split:                   # time-aware split, as in your draft
+oulad_split:                   # time-aware split
   train: [2013B, 2013J]
   validation: [2014B]
   test: [2014J]
@@ -89,10 +89,10 @@ knust:
   activity_time_col: activity_time
   activity_type_col: activity_type
   activity_source_col: source
-  time_format: null            # null lets pandas infer. CHECK
+  time_format: null            # null lets pandas infer. 
   gradebook_file: gradebook_grades.csv
   gradebook_id_col: participant_id
-  gradebook_quiz_cols: [Module 1 Quiz, Module 2 Quiz, Module 3 Quiz, Module 4 Quiz, Module 5 Quiz, Module 6 Quiz]   # in module order (after the long-to-wide pivot). CHECK
+  gradebook_quiz_cols: [Module 1 Quiz, Module 2 Quiz, Module 3 Quiz, Module 4 Quiz, Module 5 Quiz, Module 6 Quiz]   # in module order (after the long-to-wide pivot).
   attempts_file: quiz_attempts.csv
   attempts_id_col: participant_id
   attempts_quiz_col: quiz_name
