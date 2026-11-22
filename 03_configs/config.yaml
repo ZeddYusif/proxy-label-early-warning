@@ -87,17 +87,17 @@ knust:                         # CHECK every column name against your three expo
   export_end: "2026-06-20"
   activity_file: activity_log.csv
   activity_id_col: participant_id
-  activity_time_col: event_time
+  activity_time_col: activity_time
   activity_type_col: activity_type
-  activity_source_col: access_source
+  activity_source_col: source
   time_format: null            # null lets pandas infer. CHECK
-  gradebook_file: gradebook.csv
+  gradebook_file: gradebook_grades.csv
   gradebook_id_col: participant_id
-  gradebook_quiz_cols: [quiz1, quiz2, quiz3, quiz4, quiz5, quiz6]   # in module order. CHECK
+  gradebook_quiz_cols: [Module 1 Quiz, Module 2 Quiz, Module 3 Quiz, Module 4 Quiz, Module 5 Quiz, Module 6 Quiz]   # in module order (after the long-to-wide pivot). CHECK
   attempts_file: quiz_attempts.csv
   attempts_id_col: participant_id
-  attempts_quiz_col: quiz
+  attempts_quiz_col: quiz_name
   attempts_state_col: state
   attempts_finished_value: finished
-  attempts_score_col: score
-  attempts_finish_col: finished_time
+  attempts_score_col: raw_score
+  attempts_finish_col: finished
