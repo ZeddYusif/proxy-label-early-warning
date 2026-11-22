@@ -126,11 +126,11 @@ for i in range(1, n_k + 1):
         if done:
             score = float(np.clip(rng.normal(6.5 + e, 1.8), 0, 10))
             t = start + pd.Timedelta(days=qd - int(rng.uniform(0, 4)), hours=int(rng.uniform(8, 22)))
-            attempts.append((pid, f"quiz{q}", "finished", round(score, 2), t.strftime("%Y-%m-%d %H:%M:%S")))
+            attempts.append((pid, kc["gradebook_quiz_cols"][q - 1], "finished", round(score, 2), t.strftime("%Y-%m-%d %H:%M:%S")))
             row.append(round(score, 2))
         else:
             if rng.random() < 0.1:
-                attempts.append((pid, f"quiz{q}", "inprogress", None, None))
+                attempts.append((pid, kc["gradebook_quiz_cols"][q - 1], "inprogress", None, None))
             row.append(None)
     grades.append(row)
     truth.append((pid, int(withdraw)))
